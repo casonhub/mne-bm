@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analyze Biomarker Results</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #eef2f7;
+            padding: 20px;
+            margin: 0;
+            color: #333;
+        }
+    
+        h1, h2 {
+            font-family: 'Poppins', Arial, sans-serif;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+    
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+    
+        h2 {
+            margin-top: 30px;
+            font-size: 22px;
+        }
+    
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+    
+        .biomarker-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+    
+        .biomarker-input {
+            width: calc(100% - 50px);
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            margin-right: 10px;
+        }
+    
+        .biomarker-input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+            outline: none;
+        }
+    
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: 'Roboto', Arial, sans-serif;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+    
+        button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+    
+        .selected-biomarkers {
+            margin-top: 20px;
+        }
+    
+        .biomarker-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+    
+        .biomarker-item button {
+            margin-left: 10px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 50%;
+            font-size: 14px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+    
+        .biomarker-item button:hover {
+            background-color: #a71d2a;
+            transform: scale(1.1);
+        }
+    
+        #results {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            font-size: 14px;
+            color: #555;
+        }
+    
+        strong {
+            font-weight: bold;
+            color: #d9534f;
+        }
+    
+        a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 14px;
+            display: inline-block;
+            margin-bottom: 15px;
+            transition: color 0.3s;
+        }
+    
+        a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+    
+        .skills-list {
+            list-style: square;
+            padding-left: 20px;
+            color: #333;
+        }
+    
+        .result-item h3 {
+            color: #495057;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+    
+        .result-item ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+    
+        .result-item ul li {
+            margin-bottom: 5px;
+            padding-left: 15px;
+            position: relative;
+            font-size: 14px;
+        }
+    
+        .result-item ul li:before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #007bff;
+        }
+    </style>
+    
+</head>
+<body>
+    
+    <div class="container">
+	<div>
+         <a href="/"><i class="fas fa-arrow-left"></i> Back</a>
+    </div>
+        <h1> Biomarker to MNDs with impaired cognitive skills</h1>
+
+        <!-- Biomarker Form -->
+        <form id="biomarkerForm">
+            <div class="biomarker-row">
+                <select id="biomarkerSelect" class="biomarker-input">
+                    {% for biomarker in biomarkers %}
+                        <option value="{{ biomarker }}">{{ biomarker }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" id="addBiomarkerBtn">+</button>
+            </div>
+
+            <div class="selected-biomarkers" id="selectedBiomarkersContainer"></div>
+
+            <button type="button" id="submitBiomarkers" class="btn btn-primary mt-3">Submit</button>
+        </form>
+
+        <!-- Display Results -->
+        <h2>Results</h2>
+        <div id="results">No results yet.</div>
+    </div>
+
+ 
+<script>
+   const selectedBiomarkers = [];
+
+   document.getElementById('addBiomarkerBtn').addEventListener('click', () => {
+       const selectElement = document.getElementById('biomarkerSelect');
+       const selectedOptions = Array.from(selectElement.selectedOptions).map(option => option.value);
+
+       selectedOptions.forEach(biomarker => {
+           if (!selectedBiomarkers.includes(biomarker)) {
+               selectedBiomarkers.push(biomarker);
+
+               const biomarkerItem = document.createElement('div');
+               biomarkerItem.className = 'biomarker-item';
+               biomarkerItem.innerHTML = `
+                   ${biomarker}
+                   <button type="button" class="remove-btn" data-biomarker="${biomarker}">-</button>
+               `;
+
+               document.getElementById('selectedBiomarkersContainer').appendChild(biomarkerItem);
+           }
+       });
+
+       document.querySelectorAll('.remove-btn').forEach(button => {
+           button.addEventListener('click', function () {
+               const biomarker = this.getAttribute('data-biomarker');
+               const index = selectedBiomarkers.indexOf(biomarker);
+               if (index !== -1) selectedBiomarkers.splice(index, 1);
+               this.parentElement.remove();
+           });
+       });
+   });
+
+   document.getElementById('submitBiomarkers').addEventListener('click', () => {
+       fetch('/get_results', {
+           method: 'POST',
+           headers: { 'Content-Type': 'application/json' },
+           body: JSON.stringify({ selected_biomarkers: selectedBiomarkers }),
+       })
+       .then(response => response.json())
+       .then(data => {
+           if (data.error) {
+               alert(data.error);
+           } else {
+               const resultsContainer = document.getElementById('results');
+               resultsContainer.innerHTML = '';
+
+               for (const [disorder, skills] of Object.entries(data)) {
+                   const resultItem = document.createElement('div');
+                   resultItem.className = 'result-item';
+
+                   const disorderTitle = document.createElement('h3');
+                   disorderTitle.textContent = disorder;
+                   resultItem.appendChild(disorderTitle);
+
+                   const skillsList = document.createElement('ul');
+                   skillsList.className = 'skills-list';
+
+                   skills.forEach(skill => {
+                       const skillItem = document.createElement('li');
+                       skillItem.textContent = skill.replace(/_/g, ' ');
+                       skillsList.appendChild(skillItem);
+                   });
+
+                   resultItem.appendChild(skillsList);
+                   resultsContainer.appendChild(resultItem);
+               }
+           }
+       })
+       .catch(() => {
+           alert('An error occurred.');
+       });
+   });
+</script>
+</body>
+</html>

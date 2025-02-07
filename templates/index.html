@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biomarker App</title>
+<style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 25px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            color: #0056b3;
+            margin-bottom: 10px;
+        }
+
+        p {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .guide {
+            background-color: #e9f7fd;
+            padding: 20px;
+            border-left: 5px solid #007bff;
+            border-radius: 5px;
+            margin-bottom: 30px;
+        }
+
+        .guide h2 {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #007bff;
+        }
+
+        .guide ul {
+            padding-left: 20px;
+        }
+
+        .guide li {
+            margin-bottom: 10px;
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .link-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .link-card {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fdfdfd;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .link-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .link-card h3 {
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        .link-card p {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .link-card a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: color 0.3s;
+        }
+
+        .link-card a:hover {
+            color: #0056b3;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Biomarker-Cognition-MND Mapping Tool </h1>
+        <p>This tool has been developed to enable reviewers to validate the findings presented in the paper by interactively exploring the relationships between biomarkers, mental and neurological disorders (MNDs), and cognitive skill impairments</p>
+
+        <div class="guide">
+            <h2>User Guide</h2>
+            <p>
+                Use the links below to explore relationship amoung the biomarker, MNDs and impaired cognitive skills. Click on each section to  see the mapping:
+                <ul>
+                    <li>In <span style="color: red; font-weight: bold;">Module 1</span> Select biomarkers from the dropdown menu, then add each biomarker by clicking the <span style="color: blue; font-weight: bold;">+</span> sign. After that, click 'Submit' to view the associated disorders and affected brain regions. You can add more biomarkers one by one to see the list of MNDs common to the set of entered biomarkers.</li>
+                    <li>In <span style="color: red; font-weight: bold;">Module 2</span> Similar to Module 1, enter a biomarker to view the list of associated cognitive skills affected by changes in the selected biomarker. You can add multiple biomarkers by selecting them one by one.</li>
+                    
+                    <li>In <span style="color: red; font-weight: bold;">Module 3</span> of this application, you can select any MNDs from the dropdown menu to view the list of impaired cognitive skills along with their associated common biomarkers</li>
+                    <li> In <span style="color: red; font-weight: bold;">Module 4</span> You can select a biomarker or a set of biomarkers by adding them one at a time. Once you submit, you will see a list of mental and neurological disorders along with the associated impaired cognitive skills.</li>
+                    <li>In <span style="color: red; font-weight: bold;">Module 5</span> You can select one or more impaired cognitive skills and submit them. Upon submission, you will receive a list of associated disorders along with their corresponding biomarkers.</li>   
+                </ul>
+            </p>
+        </div>
+
+        <div class="link-section">
+            <!-- Biomarkers Link -->
+            <div class="link-card">
+                <h3>1:Mapping of Biomarkers to MNDs</h3>
+                <p>Explore the relationships between various biomarkers and their associated MNDs, as well as the brain regions where these biomarkers exhibit changes.</p>
+                <a href="/biomarkers">Mapping of Biomarkers to MNDs with brain regions </a>
+            </div>
+
+            <!-- Skills Link -->
+            <div class="link-card">
+                <h3> 2:Mapping of Biomarkers to Cognitive Skills Impairment</h3>
+                <p>Explore the relationships between various biomarkers and their associated Impaired cognitive skills, as well as the brain regions where these biomarkers exhibit changes.</p>
+                <a href="/skills">Mapping of biomarkers to impaired cognitive Skills</a>
+            </div>
+
+            <!-- Cognitive Biomarkers Link 
+            <div class="link-card">
+                <h3>3:Mapping of Impairment of Cognitive Skills to MND </h3>
+             <p>Mapping of Impaired cognitive skills to MND along with common biomarkers</p>
+                <a href="/cognitive">Mapping of Impaired Cognitive skills to MND</a>
+            </div> -->
+
+            <!-- All Disorders Cognitive Biomarkers Link -->
+            <div class="link-card">
+                <h3>3:Mapping of Mental Disorders Cognitive Skill Impairment with Biomarkers</h3>
+                <p> Select any MND to visualize the corresponding impaired cognitive skills along with their associated biomarkers</p>
+                <a href="/mental_disorders">Mapping of MNDs to Cognitive skills and Biomarkers</a>
+            </div>
+
+            <!-- Get Results Link -->
+            <div class="link-card">
+                <h3>4:Mapping of Biomarker  to MNDs for impaired cognitive skills</h3>
+                <p>Select a biomarker or a set of biomarkers to visualize the associated MNDs and the corresponding impaired cognitive skills</p>
+                <a href="/bmdisorders">Biomarkers to MNDs and Impaired cognitive skills</a>
+            </div>
+
+            <!-- Process Skills Link -->
+            <div class="link-card">
+                <h3>5:Mapping of Impaired Cognitive Skills to MNDs</h3>
+                <p>Select one or more impaired cognitive skills to view the associated MNDs, along with the common biomarkers and corresponding brain regions..</p>
+                <a href="/cogskills">Cognitive Skills to MNDs with biomarkers</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2024 CANE Biomarker App. All rights reserved.
+    </footer>
+</body>
+</html>

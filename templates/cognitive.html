@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biomarker App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .biomarker-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .biomarker-input {
+            width: 100%;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .add-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 50%;
+            font-size: 20px;
+            line-height: 16px;
+        }
+        .add-btn:hover {
+            background-color: #0056b3;
+        }
+        .selected-biomarkers {
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+        }
+        .biomarker-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .biomarker-item button {
+            margin-left: 10px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            cursor: pointer;
+            border-radius: 50%;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biomarker App</title>
+    <style>
+        /* Custom styling as needed */
+    </style>
+</head>
+<body>
+    
+    <div class="container">
+	<div>
+	<a href="/"><i class="fas fa-arrow-left"></i> Back</a>
+	</div>
+        <h1>Cognitive Skills impairement to Disorders Mapping</h1>
+
+        <!-- Biomarker Form -->
+        <form id="biomarkerForm" method="POST">
+            <!-- Selected Biomarkers Display Area -->
+            <div class="selected-biomarkers" id="selectedBiomarkersContainer"></div>
+
+            <!-- Biomarker Selector -->
+            <div class="biomarker-row">
+                <select id="biomarkerSelect" class="biomarker-input">
+                    <option value="" disabled selected>Select a biomarker...</option>
+                    {% for biomarker in biomarker_data %}
+                        <option value="{{ biomarker }}">{{ biomarker }}</option>
+                    {% endfor %}
+                </select>
+                <button type="button" id="addBiomarkerBtn">+</button>
+            </div>
+
+            <!-- Hidden Input to Hold Selected Biomarkers for Submission -->
+            <input type="hidden" name="selected_biomarkers" id="selectedBiomarkersInput" value="{% if selected_biomarkers %}{{ selected_biomarkers|join(',') }}{% endif %}">
+
+            <button type="submit" class="btn btn-primary mt-3">Submit</button>
+        </form>
+
+        <!-- Display Associated Disorders -->
+        <table>
+            <tr>
+                <th>Disorder</th>
+                <th>Associated Biomarkers (by Skill)</th>
+            </tr>
+            {% for item in disorders_with_biomarkers %}
+            <tr>
+                <td>{{ item.disorder }}</td>
+                <td>
+                    <ul>
+                        {% for skill, biomarkers in item.biomarkers.items() %}
+                        <li><strong>{{ skill }}:</strong> {{ biomarkers }}</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        
+    </div>
+
+    <script>
+        // Initialize selectedBiomarkersList with server-passed initial values
+        let selectedBiomarkersList = document.getElementById('selectedBiomarkersInput').value
+            ? document.getElementById('selectedBiomarkersInput').value.split(',')
+            : [];
+
+        const biomarkerSelect = document.getElementById('biomarkerSelect');
+        const selectedBiomarkersContainer = document.getElementById('selectedBiomarkersContainer');
+        const selectedBiomarkersInput = document.getElementById('selectedBiomarkersInput');
+        const addBiomarkerBtn = document.getElementById('addBiomarkerBtn');
+        const biomarkerForm = document.getElementById('biomarkerForm');
+
+        // Populate initial selected biomarkers from the server-side data
+        function renderSelectedBiomarkers() {
+            selectedBiomarkersContainer.innerHTML = ''; // Clear existing items
+
+            selectedBiomarkersList.forEach((biomarker, index) => {
+                const biomarkerItem = document.createElement('div');
+                biomarkerItem.className = 'biomarker-item';
+                biomarkerItem.dataset.index = index;
+
+                const selectElement = document.createElement('select');
+                selectElement.className = 'biomarker-input';
+
+                // Populate options dynamically
+                const biomarkerOptions = Array.from(biomarkerSelect.options).map(option => option.value);
+                biomarkerOptions.forEach(option => {
+                    const optionElement = document.createElement('option');
+                    optionElement.value = option;
+                    optionElement.textContent = option;
+                    if (option === biomarker) {
+                        optionElement.selected = true;
+                    }
+                    selectElement.appendChild(optionElement);
+                });
+
+                // Handle changes in selected biomarker
+                selectElement.addEventListener('change', function () {
+                    const newValue = selectElement.value;
+                    if (selectedBiomarkersList.includes(newValue) && newValue !== biomarker) {
+                        alert("Please select a unique biomarker!");
+                        selectElement.value = biomarker; // Revert back to the original value
+                    } else {
+                        selectedBiomarkersList[index] = newValue;
+                        updateHiddenInput();
+                    }
+                });
+
+                // Remove button to delete biomarker from the list
+                const removeButton = document.createElement('button');
+                removeButton.textContent = "-";
+                removeButton.classList.add('remove-btn');
+                removeButton.addEventListener('click', function () {
+                    selectedBiomarkersList.splice(index, 1);
+                    renderSelectedBiomarkers();
+                    updateHiddenInput();
+                });
+
+                biomarkerItem.appendChild(selectElement);
+                biomarkerItem.appendChild(removeButton);
+                selectedBiomarkersContainer.appendChild(biomarkerItem);
+            });
+        }
+
+        // Add Biomarker Function
+        addBiomarkerBtn.addEventListener('click', function () {
+            const biomarkerValue = biomarkerSelect.value.trim();
+            if (!biomarkerValue || selectedBiomarkersList.includes(biomarkerValue)) {
+                alert("Please select a unique biomarker!");
+                return;
+            }
+
+            selectedBiomarkersList.push(biomarkerValue);
+            renderSelectedBiomarkers();
+            updateHiddenInput();
+            biomarkerSelect.value = ''; // Reset selector
+        });
+
+        // Update the hidden input with the current selected biomarkers list
+        function updateHiddenInput() {
+            selectedBiomarkersInput.value = selectedBiomarkersList.join(',');
+        }
+
+        // Initial rendering of selected biomarkers
+        renderSelectedBiomarkers();
+
+        // Ensure form submission uses updated hidden input values
+        biomarkerForm.addEventListener('submit', function (event) {
+            updateHiddenInput();
+        });
+    </script>
+</body>
+</html>

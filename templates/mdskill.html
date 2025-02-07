@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Mental Disorders</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #007bff;
+            font-size: 1.8em;
+        }
+
+        label {
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            display: block;
+            color: #555;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus {
+            border-color: #007bff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 1em;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #007bff;
+        }
+
+        .result {
+            margin-top: 20px;
+        }
+
+        .result h3 {
+            color: #007bff;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .result ul {
+            list-style-type: disc;
+            margin-left: 20px;
+            color: #555;
+        }
+
+        .result strong {
+            color: #333;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007bff;
+            display: inline-block;
+            margin-bottom: 20px;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        a:hover {
+            color: #0056b3;
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .loader span {
+            font-size: 1.2em;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+	<div>
+        <a href="/"><i class="fas fa-arrow-left"></i> Back</a>
+	</div>
+        <h1>Select Mental Disorders</h1>
+        <label for="disorders">Choose disorder</label>
+        <select id="disorders" >
+            {% for disorder in disorders %}
+                <option value="{{ disorder }}">{{ disorder }}</option>
+            {% endfor %}
+        </select>
+        <button onclick="submitDisorders()">Submit</button>
+
+        <div class="loader" id="loader">
+            <span><i class="fas fa-spinner fa-spin"></i> Processing...</span>
+        </div>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function submitDisorders() {
+            const loader = document.getElementById('loader');
+            const resultDiv = document.getElementById('result');
+            const select = document.getElementById('disorders');
+            const selectedOptions = Array.from(select.selectedOptions).map(option => option.value);
+
+            // Clear previous results and show loader
+            resultDiv.innerHTML = '';
+            loader.style.display = 'block';
+
+            // Send selected disorders to Flask backend
+            fetch('/get_skills', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ disorders: selectedOptions })
+            })
+            .then(response => response.json())
+            .then(data => {
+                loader.style.display = 'none';
+
+                if (data.length === 0) {
+                    resultDiv.innerHTML = '<p>No matching skills found.</p>';
+                    return;
+                }
+
+                let content = '<h3>Results:</h3>';
+                data.forEach(item => {
+                    content += `
+                        <strong>Impaired Cognitive Skill:</strong>
+                        <span style="color: blue; font-weight: bold;">${item.cognitive_skill}</span><br>
+                    `;
+                    for (const [disorder, biomarkers] of Object.entries(item.biomarkers)) {
+                        const biomarkerList = biomarkers
+                            .split(';')
+                            .map(biomarker => `<li>${biomarker.trim()}</li>`)
+                            .join('');
+                        content += `
+                            <strong>Common Biomarkers with ${disorder}:</strong>
+                            <ul>${biomarkerList}</ul>
+                        `;
+                    }
+                    content += '<br>';
+                });
+                resultDiv.innerHTML = content;
+            })
+            .catch(error => {
+                loader.style.display = 'none';
+                console.error('Error:', error);
+                resultDiv.innerHTML = '<p>Something went wrong. Please try again later.</p>';
+            });
+        }
+    </script>
+</body>
+</html>
